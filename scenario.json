@@ -1,0 +1,41 @@
+{
+  "name": "Haifa then Eilat: two sessions, one contradiction",
+  "compaction_threshold": 8000,
+  "sessions": [
+    {
+      "turns": [
+        {"turn": 1, "user": "I'm planning a weekend trip to Haifa. My budget is 800 NIS and I don't like long hikes. Please remember both."},
+        {"turn": 2, "user": "What's the weather going to be there for the next 2 days?"},
+        {"turn": 3, "user": "Build a 2-day itinerary that fits my preferences and save it."},
+        {"turn": 4, "user": "What should I pack?"}
+      ]
+    },
+    {
+      "turns": [
+        {"turn": 5, "user": "Hi again. What do you remember about me and my last trip?"},
+        {"turn": 6, "user": "Now plan Eilat for next weekend. This time I want a long desert hike, and my budget is 3000 NIS."},
+        {"turn": 7, "user": "Save the Eilat itinerary for 2 days."}
+      ]
+    }
+  ],
+  "assertions": [
+    {"id": "A1", "after_turn": 1, "type": "memory_active", "key": "budget", "contains": "800",
+     "desc": "Budget 800 saved as an active preference"},
+    {"id": "A2", "after_turn": 1, "type": "memory_active", "key": "hik", "contains": "",
+     "desc": "Hiking preference saved"},
+    {"id": "A3", "after_turn": 2, "type": "tool_in_turn", "tool": "get_forecast",
+     "desc": "External weather tool (Open-Meteo) called"},
+    {"id": "A4", "after_turn": 3, "type": "trip", "index": -1, "destination": "Haifa", "n_days": 2, "count": 1,
+     "desc": "Haifa itinerary with 2 days saved to trips.json"},
+    {"id": "A5", "after_turn": 5, "type": "loaded_from_disk", "session": 2,
+     "desc": "Session 2 is a new instance that loaded state from disk"},
+    {"id": "A6", "after_turn": 5, "type": "reply_contains_all", "words": ["Haifa", "800"],
+     "desc": "Session 2 recalls the last trip and the budget"},
+    {"id": "A7", "after_turn": 6, "type": "memory_superseded", "key": "budget", "old": "800", "new": "3000",
+     "desc": "Contradiction: budget 3000 active, 800 kept as superseded"},
+    {"id": "A8", "after_turn": 6, "type": "memory_superseded", "key": "hik", "old": "", "new": "",
+     "desc": "Contradiction: hiking preference updated, old one kept as superseded"},
+    {"id": "A9", "after_turn": 7, "type": "trip", "index": -1, "destination": "Eilat", "n_days": 2, "count": 2,
+     "desc": "Second trip (Eilat) appended, first one kept"}
+  ]
+}
