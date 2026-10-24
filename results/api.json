@@ -1,0 +1,242 @@
+{
+  "variant": "api",
+  "scenario": "Haifa then Eilat: two sessions, one contradiction",
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "versions": {
+    "anthropic": "2.3.0",
+    "claude-agent-sdk": "0.2.174"
+  },
+  "run_at": "2026-10-24T21:17:58+00:00",
+  "turns": [
+    {
+      "session": 1,
+      "turn": 1,
+      "user": "I'm planning a weekend trip to Haifa. My budget is 800 NIS and I don't like long hikes. Please remember both.",
+      "reply": "I saved both preferences: a budget of **800 NIS** and **no long hikes**.\n\n**Haifa weather this weekend**\n- **Fri 30 Oct:** 16–23°C, cloudy, very light rain (0.3 mm)\n- **Sat 31 Oct:** 15–24°C, cloudy and dry\n- **Thu 29 Oct** is the wettest day of the week (3.9 mm, showers), so it's better not to arrive early.\n\n**Plan ideas that fit your preferences (short walks only)**\n- **Day 1:** Take the Carmelit (underground funicular) up to Bahá'í Gardens viewpoint, which skips the climb. Then the German Colony for dinner.\n- **Day 2:** Take the cable car from Bat Galim up to Stella Maris. Then Wadi Nisnas market and the Haifa Museum of Art. End with sunset on Dado Beach.\n- **Rough budget:** about 500–650 NIS for a mid-range room, food and transport. That leaves some spare money within your 800 NIS.\n\nDo you want me to save this itinerary or make a packing list?",
+      "tokens": {
+        "input": 8,
+        "cache_read": 4689,
+        "cache_write": 725,
+        "output": 736
+      },
+      "model_calls": 3,
+      "tools": [
+        "remember",
+        "remember",
+        "geocode",
+        "get_forecast"
+      ],
+      "tool_errors": 0,
+      "cost_usd": 0.019315,
+      "cache_hit_pct": 86.5,
+      "time_s": 12.16,
+      "compacted": false
+    },
+    {
+      "session": 1,
+      "turn": 2,
+      "user": "What's the weather going to be there for the next 2 days?",
+      "reply": "**Haifa, next 2 days**\n- **Sun 25 Oct:** 22–27°C, partly cloudy and dry\n- **Mon 26 Oct:** 20–27°C, foggy at times, very light rain (0.2 mm), so basically dry\n\nBoth days are warm and fine for being outside. Light clothes are enough, and you won't need an umbrella.",
+      "tokens": {
+        "input": 4,
+        "cache_read": 2177,
+        "cache_write": 469,
+        "output": 256
+      },
+      "model_calls": 1,
+      "tools": [],
+      "tool_errors": 0,
+      "cost_usd": 0.007916,
+      "cache_hit_pct": 82.2,
+      "time_s": 3.58,
+      "compacted": false
+    },
+    {
+      "session": 1,
+      "turn": 3,
+      "user": "Build a 2-day itinerary that fits my preferences and save it.",
+      "reply": "I saved your 2-day Haifa itinerary for this weekend (trip #1). It sticks to short walks and uses the funicular, cable car and promenades instead of climbs.\n\n**Day 1 – Fri 30 Oct (16–23°C, cloudy, very light rain)**\n- Carmelit funicular up to Carmel Center, then the Bahá'í Gardens upper viewpoint\n- Lunch on Carmel Center\n- Haifa Museum of Art or MadaTech, both indoors if it drizzles\n- German Colony stroll and dinner on Ben Gurion Blvd\n\n**Day 2 – Sat 31 Oct (15–24°C, cloudy, dry)**\n- Breakfast and a short walk in Wadi Nisnas\n- Bat Galim promenade, then the cable car up to Stella Maris\n- Seafood lunch and time at Dado Beach, staying for sunset\n- Shabbat: the Carmelit and most buses don't run, so use the cable car or a taxi\n\n**Estimated cost: about 770–810 NIS**\n- Hotel about 300, food about 340, transport and entry about 130–170\n- The top of that range is slightly over your 800 NIS. Choose the museum (about 50 NIS) rather than MadaTech (about 90 NIS) to stay under.\n\nDo you want a packing list for this trip?",
+      "tokens": {
+        "input": 6,
+        "cache_read": 5619,
+        "cache_write": 928,
+        "output": 1130
+      },
+      "model_calls": 2,
+      "tools": [
+        "save_itinerary"
+      ],
+      "tool_errors": 0,
+      "cost_usd": 0.028388,
+      "cache_hit_pct": 85.7,
+      "time_s": 12.96,
+      "compacted": false
+    },
+    {
+      "session": 1,
+      "turn": 4,
+      "user": "What should I pack?",
+      "reply": "This list is for Haifa on 30–31 Oct (15–24°C, light rain possible Friday).\n\n**Essentials**\n- ID\n- Phone charger\n- Water bottle\n\n**Weather**\n- Light rain jacket or small umbrella (one is enough, since rain is minimal)\n- Sunscreen\n\n**Beach (Dado, Saturday)**\n- Swimsuit\n- Towel\n\n**Clothes** (the packing tool didn't include these, so I added them)\n- T-shirts and a light layer for cool evenings (15°C)\n- Comfortable walking shoes. There are no long hikes, but the city is hilly.\n- Sandals for the beach",
+      "tokens": {
+        "input": 6,
+        "cache_read": 7807,
+        "cache_write": 871,
+        "output": 399
+      },
+      "model_calls": 2,
+      "tools": [
+        "packing_list"
+      ],
+      "tool_errors": 0,
+      "cost_usd": 0.01392,
+      "cache_hit_pct": 89.9,
+      "time_s": 5.56,
+      "compacted": false
+    },
+    {
+      "session": 2,
+      "turn": 5,
+      "user": "Hi again. What do you remember about me and my last trip?",
+      "reply": "**Your preferences**\n- Budget: 800 NIS\n- Hiking: no long hikes\n\n**Your last trip (#1)**\n- Haifa, 2 days (Fri 30 – Sat 31 Oct), 800 NIS budget\n- Day 1: Carmelit funicular, Bahá'í Gardens viewpoint, a museum, dinner in the German Colony\n- Day 2: Wadi Nisnas, Stella Maris cable car, Dado Beach at sunset\n- Estimated cost: about 770–810 NIS. Picking the cheaper museum keeps it under 800.\n\nDo you want to change anything or plan a new trip?",
+      "tokens": {
+        "input": 4,
+        "cache_read": 4445,
+        "cache_write": 328,
+        "output": 242
+      },
+      "model_calls": 1,
+      "tools": [],
+      "tool_errors": 0,
+      "cost_usd": 0.007385,
+      "cache_hit_pct": 93.1,
+      "time_s": 2.85,
+      "compacted": false
+    },
+    {
+      "session": 2,
+      "turn": 6,
+      "user": "Now plan Eilat for next weekend. This time I want a long desert hike, and my budget is 3000 NIS.",
+      "reply": "I've updated your preferences: **long desert hikes** and a **3000 NIS** budget. The old values are kept as history.\n\n**Which weekend?** Your Haifa trip is already on Fri 30 – Sat 31 Oct. If \"next weekend\" means 6–7 Nov, that's beyond the 7-day forecast. Here's the plan using the latest dates I can forecast (30–31 Oct):\n\n**Eilat weather**\n- **Fri 30 Oct:** 18–26°C, mostly clear\n- **Sat 31 Oct:** 19–26°C, cloudy and dry\n- **Wed 28 Oct** has showers (2.4 mm). Check flash-flood warnings before going into the canyons.\n\n**Day 1 – Long desert hike**\n- Start at dawn: Mt. Yoash viewpoint, then down Nahal Gishron to the coast (about 6–7 hours, hard)\n- Carry 4–5 L of water per person, start early and arrange a taxi pickup at the end\n- Evening: dinner on the promenade, then an early night\n\n**Day 2 – Recovery and the Red Sea**\n- Short Red Canyon walk (about 1 hour), or Timna Park by car\n- Afternoon: snorkelling at Coral Beach Nature Reserve\n- Sunset at North Beach\n\n**Estimated cost: about 1900–2600 NIS, within your 3000 NIS**\n- Flight or bus: 200–600\n- Hotel for 2 nights: 900–1200\n- Food: 500–600\n- Hike taxi, reserve and park entry, snorkel gear: 300–400\n\nDo you want me to save this itinerary or make a packing list?",
+      "tokens": {
+        "input": 8,
+        "cache_read": 15586,
+        "cache_write": 1301,
+        "output": 1377
+      },
+      "model_calls": 3,
+      "tools": [
+        "remember",
+        "remember",
+        "geocode",
+        "get_forecast"
+      ],
+      "tool_errors": 0,
+      "cost_usd": 0.037194,
+      "cache_hit_pct": 92.3,
+      "time_s": 17.71,
+      "compacted": false
+    },
+    {
+      "session": 2,
+      "turn": 7,
+      "user": "Save the Eilat itinerary for 2 days.",
+      "reply": "I saved the Eilat itinerary as trip #2: 2 days, with a 3000 NIS budget.\n\n- **Day 1:** Start at dawn with Mt. Yoash, then the long Nahal Gishron hike (6–7 hours). Bring 4–5 L of water per person. Don't hike if a flash flood is forecast.\n- **Day 2:** Red Canyon or Timna in the morning, snorkelling at Coral Beach, then sunset at North Beach.\n- **Cost:** I estimated 1900–2600 NIS, which fits your 3000 NIS budget.\n\n**Still open:** which dates is this for?\n- **30–31 Oct:** it clashes with your Haifa trip, but I have the forecast: 18–26°C and dry.\n- **6–7 Nov:** that's too far ahead to forecast now. Check again closer to the trip, mainly for flash-flood risk.\n\nWant me to make a packing list for this trip?",
+      "tokens": {
+        "input": 10,
+        "cache_read": 9586,
+        "cache_write": 2100,
+        "output": 1274
+      },
+      "model_calls": 3,
+      "tools": [
+        "save_itinerary"
+      ],
+      "tool_errors": 0,
+      "cost_usd": 0.037937,
+      "cache_hit_pct": 82.0,
+      "time_s": 14.42,
+      "compacted": true
+    }
+  ],
+  "totals": {
+    "tokens": {
+      "input": 46,
+      "cache_read": 49909,
+      "cache_write": 6722,
+      "output": 5414
+    },
+    "cache_hit_pct": 88.1,
+    "model_calls": 15,
+    "cost_usd": 0.152055,
+    "time_s": 69.24
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "desc": "Budget 800 saved as an active preference",
+      "passed": true,
+      "detail": "[{\"key\": \"budget\", \"value\": \"800 NIS\", \"status\": \"active\", \"created_at\": \"2026-10-24T21:16:51+00:00\"}]"
+    },
+    {
+      "id": "A2",
+      "desc": "Hiking preference saved",
+      "passed": true,
+      "detail": "[{\"key\": \"hiking\", \"value\": \"no long hikes\", \"status\": \"active\", \"created_at\": \"2026-10-24T21:16:51+00:00\"}]"
+    },
+    {
+      "id": "A3",
+      "desc": "External weather tool (Open-Meteo) called by the weather question",
+      "passed": true,
+      "detail": "called in turns [1]"
+    },
+    {
+      "id": "A4",
+      "desc": "Haifa itinerary with 2 days saved to trips.json",
+      "passed": true,
+      "detail": "Haifa, 2 days"
+    },
+    {
+      "id": "A5",
+      "desc": "Session 2 is a new instance that loaded state from disk",
+      "passed": true,
+      "detail": "loaded_from_disk=16"
+    },
+    {
+      "id": "A6",
+      "desc": "Session 2 recalls the last trip and the budget",
+      "passed": true,
+      "detail": "missing=[]"
+    },
+    {
+      "id": "A7",
+      "desc": "Contradiction: budget 3000 active, 800 kept as superseded",
+      "passed": true,
+      "detail": "[[\"800 NIS\", \"superseded\"], [\"3000 NIS\", \"active\"]]"
+    },
+    {
+      "id": "A8",
+      "desc": "Contradiction: hiking preference updated, old one kept as superseded",
+      "passed": true,
+      "detail": "[[\"no long hikes\", \"superseded\"], [\"wants long desert hikes\", \"active\"]]"
+    },
+    {
+      "id": "A9",
+      "desc": "Second trip (Eilat) appended, first one kept",
+      "passed": true,
+      "detail": "Eilat, 2 days"
+    }
+  ],
+  "assertions_passed": "9/9",
+  "loc": {
+    "loop": 31,
+    "tools": 96,
+    "history": 23,
+    "memory": 29,
+    "context": 12,
+    "compaction": 18,
+    "caching": 15,
+    "tokens": 40,
+    "agent.py + main.py": 79
+  }
+}

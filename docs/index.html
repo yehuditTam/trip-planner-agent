@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trip Planner: API vs SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f1e7; --paper: #fffdf8; --ink: #1f2a33; --muted: #6b7680; --line: #e4dccb;
+  --api: #0f766e; --api-soft: #d5ece8; --sdk: #d9622b; --sdk-soft: #f8e1d4;
+  --ok: #2f8f4e; --stamp: #b4372f; --shadow: 0 1px 2px rgba(31,42,51,.06), 0 8px 24px rgba(31,42,51,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11171d; --paper: #18212a; --ink: #e8edf1; --muted: #93a1ad; --line: #2a3642;
+    --api: #3cc0b0; --api-soft: #173a38; --sdk: #f08a55; --sdk-soft: #3d2618;
+    --ok: #5fc27e; --stamp: #f07a6e; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11171d; --paper: #18212a; --ink: #e8edf1; --muted: #93a1ad; --line: #2a3642;
+  --api: #3cc0b0; --api-soft: #173a38; --sdk: #f08a55; --sdk-soft: #3d2618;
+  --ok: #5fc27e; --stamp: #f07a6e; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 Inter, system-ui, sans-serif; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px 64px; }
+h1, h2, h3 { font-family: Fraunces, Georgia, serif; font-weight: 700; letter-spacing: -.01em; margin: 0; }
+h2 { font-size: 26px; margin: 56px 0 6px; }
+.lede { color: var(--muted); margin: 0 0 20px; max-width: 70ch; }
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+.api { color: var(--api); } .sdk { color: var(--sdk); }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+
+/* hero */
+header { padding: 48px 0 8px; }
+.kicker { text-transform: uppercase; letter-spacing: .14em; font-size: 12px; color: var(--muted); font-weight: 600; }
+header h1 { font-size: clamp(32px, 6vw, 54px); line-height: 1.05; margin: 10px 0 12px; }
+header p { color: var(--muted); max-width: 64ch; margin: 0; }
+.toggle { float: right; margin-top: 4px; background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; font: inherit; font-size: 13px; }
+
+/* boarding passes */
+.passes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin-top: 28px; }
+.pass { display: grid; grid-template-columns: 1fr auto; overflow: hidden; position: relative; }
+.pass .main { padding: 20px 22px; }
+.pass .stub { width: 112px; padding: 20px 14px; border-left: 2px dashed var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.pass .band { height: 6px; grid-column: 1 / -1; }
+.pass.api .band { background: var(--api); } .pass.sdk .band { background: var(--sdk); }
+.pass h3 { font-size: 22px; }
+.pass .sub { color: var(--muted); font-size: 13px; margin: 2px 0 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 10px; }
+.stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.stat .v { font-family: "JetBrains Mono", monospace; font-size: 18px; }
+.stub .big { font-family: Fraunces, serif; font-size: 34px; font-weight: 700; line-height: 1; }
+.stub .k { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-top: 6px; }
+
+/* route / timeline */
+.route { position: relative; padding-left: 34px; }
+.route::before { content: ""; position: absolute; left: 13px; top: 6px; bottom: 6px; border-left: 3px dotted var(--line); }
+.session-label { position: relative; margin: 26px 0 12px; font-family: Fraunces, serif; font-size: 18px; }
+.session-label::before { content: ""; position: absolute; left: -29px; top: 4px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); border: 4px solid var(--bg); }
+.session-label span { color: var(--muted); font-family: Inter, sans-serif; font-size: 13px; margin-left: 6px; }
+.stop { position: relative; padding: 16px 18px; margin-bottom: 14px; }
+.stop::before { content: attr(data-n); position: absolute; left: -34px; top: 16px; width: 26px; height: 26px; border-radius: 50%; background: var(--paper); border: 2px solid var(--ink); font: 600 12px/22px Inter, sans-serif; text-align: center; }
+.stop .q { font-weight: 500; margin: 0 0 10px; }
+.lanes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lane { border-radius: 10px; padding: 10px 12px; }
+.lane.api { background: var(--api-soft); } .lane.sdk { background: var(--sdk-soft); }
+.lane .hd { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--ink); }
+.lane .hd b { color: inherit; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 6px; min-height: 22px; }
+.chip { font: 500 11.5px "JetBrains Mono", monospace; padding: 2px 7px; border-radius: 6px; background: var(--paper); border: 1px solid var(--line); color: var(--ink); }
+.chip.ext { border-color: currentColor; }
+.chip.none { color: var(--muted); font-style: italic; border-style: dashed; }
+.meta { font-size: 12px; color: var(--muted); font-family: "JetBrains Mono", monospace; }
+.flag { display: inline-block; margin-left: 6px; font: 600 10px Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: var(--stamp); color: #fff; }
+details { margin-top: 10px; font-size: 13.5px; }
+summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+.replies { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.replies div { white-space: pre-wrap; background: var(--bg); border-radius: 8px; padding: 10px; max-height: 260px; overflow: auto; font-size: 12.5px; }
+
+/* charts */
+.chart { padding: 18px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.rows { display: grid; gap: 7px; }
+.row { display: grid; grid-template-columns: 92px 1fr 74px; align-items: center; gap: 10px; font-size: 12.5px; }
+.row .lbl { color: var(--muted); }
+.bar { display: flex; height: 16px; border-radius: 4px; overflow: hidden; background: var(--bg); }
+.bar span { height: 100%; }
+.row .num { font-family: "JetBrains Mono", monospace; text-align: right; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+
+/* stamps */
+.stamps { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.stampc { padding: 14px 16px; position: relative; }
+.stampc .id { font: 700 13px "JetBrains Mono", monospace; }
+.stampc p { margin: 6px 0 10px; font-size: 13.5px; }
+.marks { display: flex; gap: 8px; }
+.mark { font: 700 10.5px Inter, sans-serif; letter-spacing: .1em; text-transform: uppercase; border: 2px solid currentColor; border-radius: 6px; padding: 2px 7px; transform: rotate(-4deg); }
+.mark.pass { color: var(--ok); } .mark.fail { color: var(--stamp); }
+
+/* findings */
+.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 18px; }
+.finding { padding: 20px 22px; }
+.finding h3 { font-size: 19px; margin-bottom: 8px; }
+.finding ul { margin: 0; padding-left: 18px; } .finding li { margin: 6px 0; }
+.verdict { padding: 24px; margin-top: 18px; border-left: 6px solid var(--sdk); }
+.verdict h3 { font-size: 22px; margin-bottom: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+td { font-family: "JetBrains Mono", monospace; }
+td:first-child { font-family: Inter, sans-serif; }
+footer { margin-top: 56px; color: var(--muted); font-size: 13px; }
+footer a { color: inherit; }
+.pass .main, .lane, .stop, .card { min-width: 0; }
+.chip { overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .passes { grid-template-columns: 1fr; }
+  .lanes, .replies { grid-template-columns: 1fr; }
+  .pass .main { padding: 16px; }
+  .pass .stub { width: 84px; padding: 16px 8px; }
+  .stub .big { font-size: 22px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .row { grid-template-columns: 70px 1fr 52px; gap: 6px; }
+  .toggle { float: none; margin-bottom: 10px; }
+  th, td { padding: 6px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button class="toggle" id="theme">Theme</button>
+    <div class="kicker">Leah &amp; Yehudit · One agent, two harnesses</div>
+    <h1>A weekend trip planner,<br>built twice.</h1>
+    <p>The same agent, tools and scenario on the raw <b class="api">Messages API</b> (hand-written harness)
+      and on the <b class="sdk">Claude Agent SDK</b> (Claude Code runs the harness). Same model
+      (<span class="mono" id="model"></span>, effort <span class="mono" id="effort"></span>), same 7 turns, clean state each run.</p>
+  </header>
+
+  <section class="passes" id="passes"></section>
+
+  <h2>The route</h2>
+  <p class="lede">Seven stops over two sessions. Session 2 is a brand-new agent instance that only knows what it reads from disk.
+    Each stop shows the tools both versions called and what the turn cost.</p>
+  <div class="route" id="route"></div>
+
+  <h2>Where the tokens went</h2>
+  <p class="lede">Input-side tokens per turn, split into fresh input, cache reads and cache writes, plus output.
+    Cache reads are cheap ($0.20/M) and cache writes are expensive ($5/M on our API, $8/M with Claude Code's 1-hour cache).</p>
+  <div class="card chart">
+    <div class="legend">
+      <span><i style="background:var(--ink);opacity:.85"></i>input</span>
+      <span><i style="background:var(--muted);opacity:.35"></i>cache read</span>
+      <span><i style="background:var(--stamp)"></i>cache write</span>
+      <span><i style="background:var(--ok)"></i>output</span>
+    </div>
+    <div class="rows" id="tokrows"></div>
+  </div>
+
+  <h2>Lines of harness code</h2>
+  <p class="lede">API: non-blank, non-comment lines per harness file. SDK: lines marked <span class="mono"># replaces: &lt;name&gt;</span>.</p>
+  <div class="grid2">
+    <div class="card chart"><div class="legend"><span><i style="background:var(--api)"></i>API</span><span><i style="background:var(--sdk)"></i>SDK</span></div><div class="rows" id="locrows"></div></div>
+    <div class="card chart"><table id="cmp"></table></div>
+  </div>
+
+  <h2>Passport stamps</h2>
+  <p class="lede">Nine pass/fail checks. Seven of them read saved state (memory.json, trips.json, tool log), not the reply text.</p>
+  <div class="stamps" id="stamps"></div>
+
+  <h2>What we learned</h2>
+  <div class="findings" id="findings"></div>
+  <div class="card verdict" id="verdict"></div>
+
+  <footer>Generated by <span class="mono">scripts/build_report.py</span> from <span class="mono">results/api.json</span> and
+    <span class="mono">results/sdk.json</span>. Source: <a href="https://github.com/yehuditTam/trip-planner-leah-yehudit">github.com/yehuditTam/trip-planner-leah-yehudit</a>.</footer>
+</div>
+
+<script id="data" type="application/json">{"api": {"variant": "api", "scenario": "Haifa then Eilat: two sessions, one contradiction", "model": "claude-opus-5-5", "effort": "medium", "versions": {"anthropic": "2.3.0", "claude-agent-sdk": "0.2.174"}, "run_at": "2026-10-24T21:17:58+00:00", "turns": [{"session": 1, "turn": 1, "user": "I'm planning a weekend trip to Haifa. My budget is 800 NIS and I don't like long hikes. Please remember both.", "reply": "I saved both preferences: a budget of **800 NIS** and **no long hikes**.\n\n**Haifa weather this weekend**\n- **Fri 30 Oct:** 16–23°C, cloudy, very light rain (0.3 mm)\n- **Sat 31 Oct:** 15–24°C, cloudy and dry\n- **Thu 29 Oct** is the wettest day of the week (3.9 mm, showers), so it's better not to arrive early.\n\n**Plan ideas that fit your preferences (short walks only)**\n- **Day 1:** Take the Carmelit (underground funicular) up to Bahá'í Gardens viewpoint, which skips the climb. Then the German Colony for dinner.\n- **Day 2:** Take the cable car from Bat Galim up to Stella Maris. Then Wadi Nisnas market and the Haifa Museum of Art. End with sunset on Dado Beach.\n- **Rough budget:** about 500–650 NIS for a mid-range room, food and transport. That leaves some spare money within your 800 NIS.\n\nDo you want me to save this itinerary or make a packing list?", "tokens": {"input": 8, "cache_read": 4689, "cache_write": 725, "output": 736}, "model_calls": 3, "tools": ["remember", "remember", "geocode", "get_forecast"], "tool_errors": 0, "cost_usd": 0.019315, "cache_hit_pct": 86.5, "time_s": 12.16, "compacted": false}, {"session": 1, "turn": 2, "user": "What's the weather going to be there for the next 2 days?", "reply": "**Haifa, next 2 days**\n- **Sun 25 Oct:** 22–27°C, partly cloudy and dry\n- **Mon 26 Oct:** 20–27°C, foggy at times, very light rain (0.2 mm), so basically dry\n\nBoth days are warm and fine for being outside. Light clothes are enough, and you won't need an umbrella.", "tokens": {"input": 4, "cache_read": 2177, "cache_write": 469, "output": 256}, "model_calls": 1, "tools": [], "tool_errors": 0, "cost_usd": 0.007916, "cache_hit_pct": 82.2, "time_s": 3.58, "compacted": false}, {"session": 1, "turn": 3, "user": "Build a 2-day itinerary that fits my preferences and save it.", "reply": "I saved your 2-day Haifa itinerary for this weekend (trip #1). It sticks to short walks and uses the funicular, cable car and promenades instead of climbs.\n\n**Day 1 – Fri 30 Oct (16–23°C, cloudy, very light rain)**\n- Carmelit funicular up to Carmel Center, then the Bahá'í Gardens upper viewpoint\n- Lunch on Carmel Center\n- Haifa Museum of Art or MadaTech, both indoors if it drizzles\n- German Colony stroll and dinner on Ben Gurion Blvd\n\n**Day 2 – Sat 31 Oct (15–24°C, cloudy, dry)**\n- Breakfast and a short walk in Wadi Nisnas\n- Bat Galim promenade, then the cable car up to Stella Maris\n- Seafood lunch and time at Dado Beach, staying for sunset\n- Shabbat: the Carmelit and most buses don't run, so use the cable car or a taxi\n\n**Estimated cost: about 770–810 NIS**\n- Hotel about 300, food about 340, transport and entry about 130–170\n- The top of that range is slightly over your 800 NIS. Choose the museum (about 50 NIS) rather than MadaTech (about 90 NIS) to stay under.\n\nDo you want a packing list for this trip?", "tokens": {"input": 6, "cache_read": 5619, "cache_write": 928, "output": 1130}, "model_calls": 2, "tools": ["save_itinerary"], "tool_errors": 0, "cost_usd": 0.028388, "cache_hit_pct": 85.7, "time_s": 12.96, "compacted": false}, {"session": 1, "turn": 4, "user": "What should I pack?", "reply": "This list is for Haifa on 30–31 Oct (15–24°C, light rain possible Friday).\n\n**Essentials**\n- ID\n- Phone charger\n- Water bottle\n\n**Weather**\n- Light rain jacket or small umbrella (one is enough, since rain is minimal)\n- Sunscreen\n\n**Beach (Dado, Saturday)**\n- Swimsuit\n- Towel\n\n**Clothes** (the packing tool didn't include these, so I added them)\n- T-shirts and a light layer for cool evenings (15°C)\n- Comfortable walking shoes. There are no long hikes, but the city is hilly.\n- Sandals for the beach", "tokens": {"input": 6, "cache_read": 7807, "cache_write": 871, "output": 399}, "model_calls": 2, "tools": ["packing_list"], "tool_errors": 0, "cost_usd": 0.01392, "cache_hit_pct": 89.9, "time_s": 5.56, "compacted": false}, {"session": 2, "turn": 5, "user": "Hi again. What do you remember about me and my last trip?", "reply": "**Your preferences**\n- Budget: 800 NIS\n- Hiking: no long hikes\n\n**Your last trip (#1)**\n- Haifa, 2 days (Fri 30 – Sat 31 Oct), 800 NIS budget\n- Day 1: Carmelit funicular, Bahá'í Gardens viewpoint, a museum, dinner in the German Colony\n- Day 2: Wadi Nisnas, Stella Maris cable car, Dado Beach at sunset\n- Estimated cost: about 770–810 NIS. Picking the cheaper museum keeps it under 800.\n\nDo you want to change anything or plan a new trip?", "tokens": {"input": 4, "cache_read": 4445, "cache_write": 328, "output": 242}, "model_calls": 1, "tools": [], "tool_errors": 0, "cost_usd": 0.007385, "cache_hit_pct": 93.1, "time_s": 2.85, "compacted": false}, {"session": 2, "turn": 6, "user": "Now plan Eilat for next weekend. This time I want a long desert hike, and my budget is 3000 NIS.", "reply": "I've updated your preferences: **long desert hikes** and a **3000 NIS** budget. The old values are kept as history.\n\n**Which weekend?** Your Haifa trip is already on Fri 30 – Sat 31 Oct. If \"next weekend\" means 6–7 Nov, that's beyond the 7-day forecast. Here's the plan using the latest dates I can forecast (30–31 Oct):\n\n**Eilat weather**\n- **Fri 30 Oct:** 18–26°C, mostly clear\n- **Sat 31 Oct:** 19–26°C, cloudy and dry\n- **Wed 28 Oct** has showers (2.4 mm). Check flash-flood warnings before going into the canyons.\n\n**Day 1 – Long desert hike**\n- Start at dawn: Mt. Yoash viewpoint, then down Nahal Gishron to the coast (about 6–7 hours, hard)\n- Carry 4–5 L of water per person, start early and arrange a taxi pickup at the end\n- Evening: dinner on the promenade, then an early night\n\n**Day 2 – Recovery and the Red Sea**\n- Short Red Canyon walk (about 1 hour), or Timna Park by car\n- Afternoon: snorkelling at Coral Beach Nature Reserve\n- Sunset at North Beach\n\n**Estimated cost: about 1900–2600 NIS, within your 3000 NIS**\n- Flight or bus: 200–600\n- Hotel for 2 nights: 900–1200\n- Food: 500–600\n- Hike taxi, reserve and park entry, snorkel gear: 300–400\n\nDo you want me to save this itinerary or make a packing list?", "tokens": {"input": 8, "cache_read": 15586, "cache_write": 1301, "output": 1377}, "model_calls": 3, "tools": ["remember", "remember", "geocode", "get_forecast"], "tool_errors": 0, "cost_usd": 0.037194, "cache_hit_pct": 92.3, "time_s": 17.71, "compacted": false}, {"session": 2, "turn": 7, "user": "Save the Eilat itinerary for 2 days.", "reply": "I saved the Eilat itinerary as trip #2: 2 days, with a 3000 NIS budget.\n\n- **Day 1:** Start at dawn with Mt. Yoash, then the long Nahal Gishron hike (6–7 hours). Bring 4–5 L of water per person. Don't hike if a flash flood is forecast.\n- **Day 2:** Red Canyon or Timna in the morning, snorkelling at Coral Beach, then sunset at North Beach.\n- **Cost:** I estimated 1900–2600 NIS, which fits your 3000 NIS budget.\n\n**Still open:** which dates is this for?\n- **30–31 Oct:** it clashes with your Haifa trip, but I have the forecast: 18–26°C and dry.\n- **6–7 Nov:** that's too far ahead to forecast now. Check again closer to the trip, mainly for flash-flood risk.\n\nWant me to make a packing list for this trip?", "tokens": {"input": 10, "cache_read": 9586, "cache_write": 2100, "output": 1274}, "model_calls": 3, "tools": ["save_itinerary"], "tool_errors": 0, "cost_usd": 0.037937, "cache_hit_pct": 82.0, "time_s": 14.42, "compacted": true}], "totals": {"tokens": {"input": 46, "cache_read": 49909, "cache_write": 6722, "output": 5414}, "cache_hit_pct": 88.1, "model_calls": 15, "cost_usd": 0.152055, "time_s": 69.24}, "assertions": [{"id": "A1", "desc": "Budget 800 saved as an active preference", "passed": true, "detail": "[{\"key\": \"budget\", \"value\": \"800 NIS\", \"status\": \"active\", \"created_at\": \"2026-10-24T21:16:51+00:00\"}]"}, {"id": "A2", "desc": "Hiking preference saved", "passed": true, "detail": "[{\"key\": \"hiking\", \"value\": \"no long hikes\", \"status\": \"active\", \"created_at\": \"2026-10-24T21:16:51+00:00\"}]"}, {"id": "A3", "desc": "External weather tool (Open-Meteo) called by the weather question", "passed": true, "detail": "called in turns [1]"}, {"id": "A4", "desc": "Haifa itinerary with 2 days saved to trips.json", "passed": true, "detail": "Haifa, 2 days"}, {"id": "A5", "desc": "Session 2 is a new instance that loaded state from disk", "passed": true, "detail": "loaded_from_disk=16"}, {"id": "A6", "desc": "Session 2 recalls the last trip and the budget", "passed": true, "detail": "missing=[]"}, {"id": "A7", "desc": "Contradiction: budget 3000 active, 800 kept as superseded", "passed": true, "detail": "[[\"800 NIS\", \"superseded\"], [\"3000 NIS\", \"active\"]]"}, {"id": "A8", "desc": "Contradiction: hiking preference updated, old one kept as superseded", "passed": true, "detail": "[[\"no long hikes\", \"superseded\"], [\"wants long desert hikes\", \"active\"]]"}, {"id": "A9", "desc": "Second trip (Eilat) appended, first one kept", "passed": true, "detail": "Eilat, 2 days"}], "assertions_passed": "9/9", "loc": {"loop": 31, "tools": 96, "history": 23, "memory": 29, "context": 12, "compaction": 18, "caching": 15, "tokens": 40, "agent.py + main.py": 79}, "harness_loc": 264}, "sdk": {"variant": "sdk", "scenario": "Haifa then Eilat: two sessions, one contradiction", "model": "claude-opus-5-5", "effort": "medium", "versions": {"anthropic": "2.3.0", "claude-agent-sdk": "0.2.174"}, "run_at": "2026-10-24T21:15:50+00:00", "turns": [{"session": 1, "turn": 1, "user": "I'm planning a weekend trip to Haifa. My budget is 800 NIS and I don't like long hikes. Please remember both.", "reply": "I saved both preferences: a budget of 800 NIS and no long hikes.\n\n**Haifa forecast for this weekend:**\n- **Fri Oct 30:** 16–23°C, overcast, only a trace of rain (0.3 mm).\n- **Sat Oct 31:** 15–24°C, overcast, no rain.\n- Midweek is showery, with the most rain on Thu Oct 29 (3.9 mm), but it clears up by the weekend.\n\n**Ideas that fit your budget and avoid long walks:**\n- Ride the Carmelit subway or the cable car instead of climbing the hills.\n- Go to the Bahá'í Gardens upper terrace and the Louis Promenade, which are flat with great views.\n- Walk around the German Colony and eat at the restaurants on Ben Gurion Blvd.\n- Take an easy walk along the beach at Bat Galim.\n- Visit Wadi Nisnas and the market for cheap, good food.\n\nDo you want a day-by-day plan with costs, or a packing list?", "tokens": {"input": 6, "cache_read": 9731, "cache_write": 423, "output": 803}, "model_calls": 3, "tools": ["remember", "remember", "geocode", "get_forecast"], "tool_errors": 0, "cost_usd": 0.021545, "cache_hit_pct": 95.8, "time_s": 12.46, "compacted": null}, {"session": 1, "turn": 2, "user": "What's the weather going to be there for the next 2 days?", "reply": "**Haifa weather, next 2 days:**\n- **Today (Sun Oct 25):** 22–27°C, partly cloudy, no rain.\n- **Tomorrow (Mon Oct 26):** 20–27°C, foggy, a trace of rain (0.2 mm).\n\nBoth days will be warm and mostly dry, so you'll only need light clothes. Rain showers start on Tuesday.", "tokens": {"input": 2, "cache_read": 3799, "cache_write": 533, "output": 262}, "model_calls": 1, "tools": [], "tool_errors": 0, "cost_usd": 0.010272, "cache_hit_pct": 87.7, "time_s": 2.97, "compacted": null}, {"session": 1, "turn": 3, "user": "Build a 2-day itinerary that fits my preferences and save it.", "reply": "I saved a 2-day Haifa plan for this weekend, Fri–Sat Oct 30–31, with a budget of 800 NIS and no long hikes.\n\n**Day 1 – Fri Oct 30 (16–23°C, cloudy, only a trace of rain)**\n- **Morning:** Take the Carmelit subway up to Carmel Center, then walk the flat Louis Promenade for views over the Bahá'í Gardens.\n- **Lunch:** Hummus or falafel in Wadi Nisnas, and a look around the market.\n- **Afternoon:** Coffee and a stroll around the German Colony on Ben Gurion Blvd.\n- **Evening:** Dinner in the German Colony, then stay overnight in a mid-range hotel or guesthouse.\n\n**Day 2 – Sat Oct 31 (15–24°C, cloudy, dry)**\n- **Morning:** Easy walk along Bat Galim beach, then breakfast by the sea.\n- **Midday:** Take the Bat Galim cable car up to Stella Maris for the view.\n- **Afternoon:** Relax in a café, then head home.\n- **Note:** Most public transport doesn't run on Shabbat, so plan on a taxi or a car. I'm not certain the Bat Galim cable car runs on Shabbat, so check before you go.\n\n**Rough budget (about 800 NIS):**\n- One night's stay: about 400 NIS\n- Food: about 250 NIS\n- Transport and cable car: about 150 NIS\n\nDo you want a packing list?", "tokens": {"input": 4, "cache_read": 8975, "cache_write": 1018, "output": 1152}, "model_calls": 2, "tools": ["save_itinerary"], "tool_errors": 0, "cost_usd": 0.032995, "cache_hit_pct": 89.8, "time_s": 11.38, "compacted": null}, {"session": 1, "turn": 4, "user": "What should I pack?", "reply": "**Packing list for Haifa, Fri–Sat (15–24°C, cloudy, basically dry):**\n\n**Essentials:**\n- ID\n- Phone charger\n- Water bottle\n\n**Beach (Bat Galim):**\n- Swimsuit\n- Towel\n- Sunscreen\n\n**My own additions, based on the forecast:**\n- A light jacket or sweater, since mornings and evenings drop to about 15°C\n- Comfortable walking shoes for the Carmel slopes\n- Light layers: T-shirts and long pants\n- A compact umbrella, just in case (Friday shows a trace of rain)\n- Cash or a card for taxis on Shabbat", "tokens": {"input": 4, "cache_read": 11252, "cache_write": 785, "output": 411}, "model_calls": 2, "tools": ["packing_list"], "tool_errors": 0, "cost_usd": 0.016766, "cache_hit_pct": 93.4, "time_s": 5.51, "compacted": null}, {"session": 2, "turn": 5, "user": "Hi again. What do you remember about me and my last trip?", "reply": "Welcome back! Here's what I have saved:\n\n**Your preferences:**\n- Budget: 800 NIS\n- Hiking: no long hikes\n\n**Your last trip:**\n- Trip #1: 2 days in Haifa with an 800 NIS budget\n- The plan covered Carmel Center, the Louis Promenade, Wadi Nisnas, the German Colony, Bat Galim beach and the cable car to Stella Maris.\n\nWant to plan another trip?", "tokens": {"input": 4, "cache_read": 12743, "cache_write": 637, "output": 220}, "model_calls": 2, "tools": ["recall"], "tool_errors": 0, "cost_usd": 0.012061, "cache_hit_pct": 95.2, "time_s": 3.88, "compacted": null}, {"session": 2, "turn": 6, "user": "Now plan Eilat for next weekend. This time I want a long desert hike, and my budget is 3000 NIS.", "reply": "Your saved preferences are now a 3000 NIS budget and long desert hikes.\n\n**Eilat forecast for next weekend:**\n- **Fri Oct 30:** 18–26°C, mostly clear, no rain.\n- **Sat Oct 31:** 19–26°C, overcast, no rain.\n- **Flood risk:** Showers on Oct 27–28 could cause flash floods. Check that the trails are open before you go.\n\n**Day 1 – Fri: long desert hike**\n- Start around 6:00 and do the Mount Shlomo loop through the Eilat Mountains. It's about 5–6 hours, with views over 4 countries.\n- Bring at least 4 liters of water per person, and finish before midday.\n- In the afternoon, rest at the hotel pool, then have dinner at the marina.\n\n**Day 2 – Sat: Red Sea and an easier hike**\n- In the morning, snorkel at Coral Beach Nature Reserve.\n- Around midday, do a short hike in the Red Canyon (about 1.5 hours).\n- In the evening, have a sunset seafood dinner by the Promenade.\n\n**Rough budget (about 3000 NIS):**\n- Hotel for 2 nights: about 1600 NIS\n- Travel there and back (flight or bus): about 600 NIS\n- Food: about 500 NIS\n- Entry fees, snorkel gear and a car or taxi to the trails: about 300 NIS\n\nDo you want me to save this plan or make a packing list?", "tokens": {"input": 6, "cache_read": 21362, "cache_write": 1242, "output": 1164}, "model_calls": 3, "tools": ["remember", "remember", "geocode", "get_forecast"], "tool_errors": 0, "cost_usd": 0.037512, "cache_hit_pct": 94.5, "time_s": 14.89, "compacted": null}, {"session": 2, "turn": 7, "user": "Save the Eilat itinerary for 2 days.", "reply": "I saved the Eilat plan as trip #2: 2 days, Fri–Sat Oct 30–31, with a 3000 NIS budget.\n\n- **Day 1:** Mount Shlomo loop (about 5–6 hours, starting around 6:00), then the pool and dinner at the marina. Check that the trails are open first, because of the flood risk after the Oct 27–28 showers.\n- **Day 2:** Snorkeling at Coral Beach, a short Red Canyon hike, then a sunset seafood dinner.\n\nDo you want a packing list for it?", "tokens": {"input": 4, "cache_read": 16727, "cache_write": 1120, "output": 558}, "model_calls": 2, "tools": ["save_itinerary"], "tool_errors": 0, "cost_usd": 0.023481, "cache_hit_pct": 93.7, "time_s": 5.69, "compacted": null}], "totals": {"tokens": {"input": 30, "cache_read": 84589, "cache_write": 5758, "output": 4570}, "cache_hit_pct": 93.6, "model_calls": 15, "cost_usd": 0.154632, "time_s": 56.78}, "assertions": [{"id": "A1", "desc": "Budget 800 saved as an active preference", "passed": true, "detail": "[{\"key\": \"budget\", \"value\": \"800 NIS\", \"status\": \"active\", \"created_at\": \"2026-10-24T21:14:53+00:00\"}]"}, {"id": "A2", "desc": "Hiking preference saved", "passed": true, "detail": "[{\"key\": \"hiking\", \"value\": \"no long hikes\", \"status\": \"active\", \"created_at\": \"2026-10-24T21:14:53+00:00\"}]"}, {"id": "A3", "desc": "External weather tool (Open-Meteo) called by the weather question", "passed": true, "detail": "called in turns [1]"}, {"id": "A4", "desc": "Haifa itinerary with 2 days saved to trips.json", "passed": true, "detail": "Haifa, 2 days"}, {"id": "A5", "desc": "Session 2 is a new instance that loaded state from disk", "passed": true, "detail": "loaded_from_disk=1"}, {"id": "A6", "desc": "Session 2 recalls the last trip and the budget", "passed": true, "detail": "missing=[]"}, {"id": "A7", "desc": "Contradiction: budget 3000 active, 800 kept as superseded", "passed": true, "detail": "[[\"800 NIS\", \"superseded\"], [\"3000 NIS\", \"active\"]]"}, {"id": "A8", "desc": "Contradiction: hiking preference updated, old one kept as superseded", "passed": true, "detail": "[[\"no long hikes\", \"superseded\"], [\"likes long desert hikes\", \"active\"]]"}, {"id": "A9", "desc": "Second trip (Eilat) appended, first one kept", "passed": true, "detail": "Eilat, 2 days"}], "assertions_passed": "9/9", "loc": {"loop": 2, "tools": 4, "history": 3, "memory": 3, "context": 1, "compaction": 1, "caching": 1, "tokens": 2, "agent.py + main.py + tools.py (total)": 133}, "harness_loc": 17}, "table": [["Input-side tokens (input + cache read + cache write)", "56,677", "90,377"], ["  of which fresh input", "46", "30"], ["  of which cache read", "49,909", "84,589"], ["  of which cache write", "6,722", "5,758"], ["Output tokens", "5,414", "4,570"], ["Cache hit %", "88.1%", "93.6%"], ["Model calls", "15", "15"], ["Cost (USD)", "$0.1521", "$0.1546"], ["Wall time", "69s", "57s"], ["Assertions passed", "9/9", "9/9"], ["Harness lines of code", "264", "17"], ["All agent code (incl. agent.py, main.py)", "343", "133"]], "findings": [{"title": "Where the SDK used more tokens", "points": ["<b>Every call is heavier.<\/b> Turn 2 is a single call with no tools in both versions: 2,650 input-side tokens on the API vs 4,334 on the SDK (+1,684). Claude Code adds its own context (environment info, the Read tool, MCP tool wrappers, CLAUDE.md) on top of our system prompt. Over the run that is 90,377 vs 56,677 input-side tokens (+59%).", "<b>Memory costs an extra round trip.<\/b> In turn 5 (\"what do you remember?\") the API injected the relevant memory into the user turn and answered in 1 call. The SDK called <code>recall<\/code> and needed 2 calls, because CLAUDE.md is loaded once per session and the model chose to double-check.", "<b>Cache writes cost more.<\/b> Claude Code writes 1-hour cache entries ($8/M, 2x input), and our API harness writes 5-minute entries ($5/M, 1.25x)."]}, {"title": "Where the SDK used fewer", "points": ["<b>Higher cache hit rate:<\/b> 93.6% vs 88.1%. Its larger, stable prefix is cached, and the 1-hour TTL even survived between our runs. Turn 1 already read 9,731 tokens from cache.", "<b>No early compaction.<\/b> We set the API threshold low (5,000 tokens) so compaction would run inside the scenario. It fired in turn 7: one extra summary call and a cache reset, $0.0379 vs $0.0235 on the SDK. Claude Code only compacts near the context limit.", "<b>Fewer output tokens<\/b> (4,570 vs 5,414) and a shorter wall time (57s vs 69s) on this run. That is within normal run-to-run variance, not a structural win.", "<b>Net cost is a wash:<\/b> $0.1521 (API) vs $0.1546 (SDK). The SDK sends 59% more tokens, but most of them are cheap cache reads."]}, {"title": "Control we had in the API and lost in the SDK", "points": ["<b>What enters each turn.<\/b> context.py puts only the memory lines relevant to <i>this<\/i> message into the user turn (none for a weather question). In the SDK, memory is CLAUDE.md, written once per session. After the contradiction in turn 6 it stays stale until the next session, and Claude Code adds context we can't see.", "<b>Cache placement and TTL.<\/b> We chose 3 breakpoints and the 5-minute TTL. The SDK decides both.", "<b>Compaction policy.<\/b> We set the threshold, the summary prompt and the shape: simple compaction, which is required because Opus 5.5 rejects edited history under replayed thinking blocks. The SDK's is automatic and opaque.", "<b>History and metering.<\/b> Our history.jsonl lives in our state dir and we see the usage of every single call. The SDK keeps the transcript under ~/.claude, reports usage per query, and <code>total_cost_usd<\/code> keeps counting across <code>resume<\/code>. We double-counted session 1 until we persisted the running total."]}, {"title": "What the SDK gave us for free", "points": ["<b>2.6x less code:<\/b> 133 lines for the whole SDK agent vs 343 for the API agent. Each of the 8 harness files collapses into 1-4 config lines.", "<b>No API key or per-token bill<\/b> for personal use. It runs on the Claude Code login.", "<b>Things we did not have to learn the hard way:<\/b> the loop, parallel tool_results, is_error, thinking-block replay rules, cache breakpoints and session persistence all come built in."]}], "verdict": {"title": "Our pick for this agent: the SDK", "body": ["Both versions passed 9/9 checks at practically the same cost, and the SDK version is a fraction of the code. A personal trip planner is a low-volume tool, and running on our Claude Code login without a key is a real advantage.", "We would switch to the API harness if this became a product: many users, where the per-call token overhead and the extra memory round trip add up, or where we need exact control over what memory each turn sees, cache policy, and per-call cost accounting."]}}</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent);
+const A = D.api, S = D.sdk;
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString("en-US");
+const usd = n => "$" + n.toFixed(4);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const inTok = t => t.input + t.cache_read + t.cache_write;
+const EXTERNAL = new Set(["geocode", "get_forecast"]);
+
+(function theme() {
+  const root = document.documentElement;
+  let saved = null; try { saved = localStorage.getItem("theme"); } catch (e) {}
+  if (saved) root.dataset.theme = saved;
+  $("theme").onclick = () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+  };
+})();
+
+$("model").textContent = A.model; $("effort").textContent = A.effort;
+
+function pass(r, cls, title, sub) {
+  const t = r.totals;
+  return `<div class="card pass ${cls}"><div class="band"></div>
+    <div class="main"><h3 class="${cls}">${title}</h3><div class="sub">${sub}</div>
+      <div class="stats">
+        <div class="stat"><div class="k">Input-side tokens</div><div class="v">${fmt(inTok(t.tokens))}</div></div>
+        <div class="stat"><div class="k">Cache hit</div><div class="v">${t.cache_hit_pct}%</div></div>
+        <div class="stat"><div class="k">Output</div><div class="v">${fmt(t.tokens.output)}</div></div>
+        <div class="stat"><div class="k">Model calls</div><div class="v">${t.model_calls}</div></div>
+        <div class="stat"><div class="k">Time</div><div class="v">${t.time_s.toFixed(0)}s</div></div>
+        <div class="stat"><div class="k">Harness LOC</div><div class="v">${r.harness_loc}</div></div>
+      </div></div>
+    <div class="stub"><div class="big ${cls}">${usd(t.cost_usd).slice(0, 6)}</div><div class="k">total cost</div>
+      <div class="big" style="font-size:24px;margin-top:14px">${r.assertions_passed}</div><div class="k">checks</div></div></div>`;
+}
+$("passes").innerHTML = pass(A, "api", "Messages API", "Hand-written harness · API/harness/*.py")
+                      + pass(S, "sdk", "Agent SDK", "Claude Code harness · SDK/*.py");
+
+function chips(tools) {
+  if (!tools.length) return `<span class="chip none">no tools</span>`;
+  return tools.map(t => `<span class="chip ${EXTERNAL.has(t) ? "ext" : ""}" title="${EXTERNAL.has(t) ? "external: Open-Meteo" : ""}">${t}</span>`).join("");
+}
+function lane(t, cls, name) {
+  return `<div class="lane ${cls}"><div class="hd"><b class="${cls}">${name}</b><span class="mono">${usd(t.cost_usd)}</span></div>
+    <div class="chips">${chips(t.tools)}</div>
+    <div class="meta">${t.model_calls} call${t.model_calls > 1 ? "s" : ""} · ${fmt(inTok(t.tokens))} in · ${t.cache_hit_pct}% cached · ${t.time_s}s${t.compacted ? '<span class="flag">compacted</span>' : ""}</div></div>`;
+}
+const SESSIONS = {1: ["Session 1", "Haifa · preferences are set"], 2: ["Session 2", "new instance · Eilat · the contradiction"]};
+let html = "", cur = 0;
+A.turns.forEach((t, i) => {
+  const s = S.turns[i];
+  if (t.session !== cur) { cur = t.session; html += `<div class="session-label">${SESSIONS[cur][0]}<span>${SESSIONS[cur][1]}</span></div>`; }
+  html += `<div class="card stop" data-n="${t.turn}"><p class="q">“${esc(t.user)}”</p>
+    <div class="lanes">${lane(t, "api", "API")}${lane(s, "sdk", "SDK")}</div>
+    <details><summary>Show both replies</summary><div class="replies"><div>${esc(t.reply)}</div><div>${esc(s.reply)}</div></div></details></div>`;
+});
+$("route").innerHTML = html;
+
+const maxIn = Math.max(...A.turns.concat(S.turns).map(t => inTok(t.tokens) + t.tokens.output));
+function tokbar(t) {
+  const w = v => (100 * v / maxIn).toFixed(2) + "%";
+  return `<div class="bar"><span style="width:${w(t.tokens.input)};background:var(--ink);opacity:.85"></span><span style="width:${w(t.tokens.cache_read)};background:var(--muted);opacity:.35"></span><span style="width:${w(t.tokens.cache_write)};background:var(--stamp)"></span><span style="width:${w(t.tokens.output)};background:var(--ok)"></span></div>`;
+}
+$("tokrows").innerHTML = A.turns.map((t, i) => {
+  const s = S.turns[i];
+  return `<div class="row"><span class="lbl api">Turn ${t.turn} · API</span>${tokbar(t)}<span class="num">${fmt(inTok(t.tokens) + t.tokens.output)}</span></div>
+          <div class="row" style="margin-bottom:6px"><span class="lbl sdk">Turn ${s.turn} · SDK</span>${tokbar(s)}<span class="num">${fmt(inTok(s.tokens) + s.tokens.output)}</span></div>`;
+}).join("");
+
+const COMP = ["loop", "tools", "history", "memory", "context", "compaction", "caching", "tokens"];
+const maxLoc = Math.max(...COMP.map(c => A.loc[c]));
+$("locrows").innerHTML = COMP.map(c => `
+  <div class="row"><span class="lbl">${c}</span><div class="bar"><span style="width:${100 * A.loc[c] / maxLoc}%;background:var(--api)"></span></div><span class="num api">${A.loc[c]}</span></div>
+  <div class="row" style="margin-bottom:6px"><span class="lbl"></span><div class="bar"><span style="width:${Math.max(1.5, 100 * S.loc[c] / maxLoc)}%;background:var(--sdk)"></span></div><span class="num sdk">${S.loc[c]}</span></div>`).join("");
+
+$("cmp").innerHTML = `<tr><th>Metric</th><th class="api">API</th><th class="sdk">SDK</th></tr>` + D.table.map(r =>
+  `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+
+$("stamps").innerHTML = A.assertions.map((a, i) => {
+  const s = S.assertions[i];
+  const m = (ok, who) => `<span class="mark ${ok ? "pass" : "fail"}">${who} ${ok ? "pass" : "fail"}</span>`;
+  return `<div class="card stampc"><div class="id">${a.id}</div><p>${esc(a.desc)}</p><div class="marks">${m(a.passed, "API")}${m(s.passed, "SDK")}</div></div>`;
+}).join("");
+
+$("findings").innerHTML = D.findings.map(f =>
+  `<div class="card finding"><h3>${f.title}</h3><ul>${f.points.map(p => `<li>${p}</li>`).join("")}</ul></div>`).join("");
+$("verdict").innerHTML = `<h3>${D.verdict.title}</h3>${D.verdict.body.map(p => `<p>${p}</p>`).join("")}`;
+</script>
+</body>
+</html>
