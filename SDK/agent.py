@@ -47,7 +47,8 @@ class SDKTripAgent:
         saved = store.read_json(SESSION_FILE, {})
         self.session_id = saved.get("session_id")              # replaces: history (load from disk)
         self.loaded_from_disk = 1 if self.session_id else 0
-        self.cost_so_far = 0.0
+        # total_cost_usd keeps counting across resume, so the running total is persisted with the session.
+        self.cost_so_far = saved.get("total_cost_usd", 0.0)
 
     async def __aenter__(self):
         write_claude_md()
@@ -72,7 +73,8 @@ class SDKTripAgent:
                 result = msg
         reply = result.result or ""
         self.session_id = result.session_id
-        store.write_json(SESSION_FILE, {"session_id": self.session_id})  # replaces: history (save to disk)
+        store.write_json(SESSION_FILE, {"session_id": self.session_id,  # replaces: history (save to disk)
+                                        "total_cost_usd": result.total_cost_usd or 0.0})
 
         u = result.usage or {}                                  # replaces: tokens
         usage = {

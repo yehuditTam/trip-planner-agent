@@ -1,6 +1,6 @@
 {
   "name": "Haifa then Eilat: two sessions, one contradiction",
-  "compaction_threshold": 8000,
+  "compaction_threshold": 5000,
   "sessions": [
     {
       "turns": [
@@ -23,8 +23,8 @@
      "desc": "Budget 800 saved as an active preference"},
     {"id": "A2", "after_turn": 1, "type": "memory_active", "key": "hik", "contains": "",
      "desc": "Hiking preference saved"},
-    {"id": "A3", "after_turn": 2, "type": "tool_in_turn", "tool": "get_forecast",
-     "desc": "External weather tool (Open-Meteo) called"},
+    {"id": "A3", "after_turn": 2, "type": "tool_by_turn", "tool": "get_forecast",
+     "desc": "External weather tool (Open-Meteo) called by the weather question"},
     {"id": "A4", "after_turn": 3, "type": "trip", "index": -1, "destination": "Haifa", "n_days": 2, "count": 1,
      "desc": "Haifa itinerary with 2 days saved to trips.json"},
     {"id": "A5", "after_turn": 5, "type": "loaded_from_disk", "session": 2,

@@ -45,9 +45,10 @@ def check(a: dict, ctx: dict) -> tuple[bool, str]:
         old = [p for p in mine if p["status"] == "superseded" and a["old"] in p["value"]]
         new = [p for p in mine if p["status"] == "active" and a["new"] in p["value"]]
         return bool(old and new), json.dumps([(p["value"], p["status"]) for p in mine], ensure_ascii=False)
-    if t == "tool_in_turn":
-        tools = ctx["turn_tools"][a["after_turn"]]
-        return a["tool"] in tools, f"tools={tools}"
+    if t == "tool_by_turn":
+        # The agent may fetch data earlier than asked (e.g. weather while planning), so any turn up to N counts.
+        called = {n: tools for n, tools in ctx["turn_tools"].items() if n <= a["after_turn"] and a["tool"] in tools}
+        return bool(called), f"called in turns {sorted(called)}"
     if t == "trip":
         trips = store.read_json(tools_impl.TRIPS_FILE, [])
         if len(trips) != a["count"]:

@@ -1,0 +1,135 @@
+
+===== session 1: new agent instance =====
+
+----- turn 1 -----
+user> I'm planning a weekend trip to Haifa. My budget is 800 NIS and I don't like long hikes. Please remember both.
+agent> I saved both preferences: a budget of 800 NIS and no long hikes.
+
+**Haifa forecast for this weekend:**
+- **Fri Oct 30:** 16–23°C, overcast, only a trace of rain (0.3 mm).
+- **Sat Oct 31:** 15–24°C, overcast, no rain.
+- Midweek is showery, with the most rain on Thu Oct 29 (3.9 mm), but it clears up by the weekend.
+
+**Ideas that fit your budget and avoid long walks:**
+- Ride the Carmelit subway or the cable car instead of climbing the hills.
+- Go to the Bahá'í Gardens upper terrace and the Louis Promenade, which are flat with great views.
+- Walk around the German Colony and eat at the restaurants on Ben Gurion Blvd.
+- Take an easy walk along the beach at Bat Galim.
+- Visit Wadi Nisnas and the market for cheap, good food.
+
+Do you want a day-by-day plan with costs, or a packing list?
+[PASS] A1 Budget 800 saved as an active preference ([{"key": "budget", "value": "800 NIS", "status": "active", "created_at": "2026-10-24T21:14:53+00:00"}])
+[PASS] A2 Hiking preference saved ([{"key": "hiking", "value": "no long hikes", "status": "active", "created_at": "2026-10-24T21:14:53+00:00"}])
+
+----- turn 2 -----
+user> What's the weather going to be there for the next 2 days?
+agent> **Haifa weather, next 2 days:**
+- **Today (Sun Oct 25):** 22–27°C, partly cloudy, no rain.
+- **Tomorrow (Mon Oct 26):** 20–27°C, foggy, a trace of rain (0.2 mm).
+
+Both days will be warm and mostly dry, so you'll only need light clothes. Rain showers start on Tuesday.
+[PASS] A3 External weather tool (Open-Meteo) called by the weather question (called in turns [1])
+
+----- turn 3 -----
+user> Build a 2-day itinerary that fits my preferences and save it.
+agent> I saved a 2-day Haifa plan for this weekend, Fri–Sat Oct 30–31, with a budget of 800 NIS and no long hikes.
+
+**Day 1 – Fri Oct 30 (16–23°C, cloudy, only a trace of rain)**
+- **Morning:** Take the Carmelit subway up to Carmel Center, then walk the flat Louis Promenade for views over the Bahá'í Gardens.
+- **Lunch:** Hummus or falafel in Wadi Nisnas, and a look around the market.
+- **Afternoon:** Coffee and a stroll around the German Colony on Ben Gurion Blvd.
+- **Evening:** Dinner in the German Colony, then stay overnight in a mid-range hotel or guesthouse.
+
+**Day 2 – Sat Oct 31 (15–24°C, cloudy, dry)**
+- **Morning:** Easy walk along Bat Galim beach, then breakfast by the sea.
+- **Midday:** Take the Bat Galim cable car up to Stella Maris for the view.
+- **Afternoon:** Relax in a café, then head home.
+- **Note:** Most public transport doesn't run on Shabbat, so plan on a taxi or a car. I'm not certain the Bat Galim cable car runs on Shabbat, so check before you go.
+
+**Rough budget (about 800 NIS):**
+- One night's stay: about 400 NIS
+- Food: about 250 NIS
+- Transport and cable car: about 150 NIS
+
+Do you want a packing list?
+[PASS] A4 Haifa itinerary with 2 days saved to trips.json (Haifa, 2 days)
+
+----- turn 4 -----
+user> What should I pack?
+agent> **Packing list for Haifa, Fri–Sat (15–24°C, cloudy, basically dry):**
+
+**Essentials:**
+- ID
+- Phone charger
+- Water bottle
+
+**Beach (Bat Galim):**
+- Swimsuit
+- Towel
+- Sunscreen
+
+**My own additions, based on the forecast:**
+- A light jacket or sweater, since mornings and evenings drop to about 15°C
+- Comfortable walking shoes for the Carmel slopes
+- Light layers: T-shirts and long pants
+- A compact umbrella, just in case (Friday shows a trace of rain)
+- Cash or a card for taxis on Shabbat
+
+===== session 2: new agent instance =====
+
+----- turn 5 -----
+user> Hi again. What do you remember about me and my last trip?
+agent> Welcome back! Here's what I have saved:
+
+**Your preferences:**
+- Budget: 800 NIS
+- Hiking: no long hikes
+
+**Your last trip:**
+- Trip #1: 2 days in Haifa with an 800 NIS budget
+- The plan covered Carmel Center, the Louis Promenade, Wadi Nisnas, the German Colony, Bat Galim beach and the cable car to Stella Maris.
+
+Want to plan another trip?
+[PASS] A5 Session 2 is a new instance that loaded state from disk (loaded_from_disk=1)
+[PASS] A6 Session 2 recalls the last trip and the budget (missing=[])
+
+----- turn 6 -----
+user> Now plan Eilat for next weekend. This time I want a long desert hike, and my budget is 3000 NIS.
+agent> Your saved preferences are now a 3000 NIS budget and long desert hikes.
+
+**Eilat forecast for next weekend:**
+- **Fri Oct 30:** 18–26°C, mostly clear, no rain.
+- **Sat Oct 31:** 19–26°C, overcast, no rain.
+- **Flood risk:** Showers on Oct 27–28 could cause flash floods. Check that the trails are open before you go.
+
+**Day 1 – Fri: long desert hike**
+- Start around 6:00 and do the Mount Shlomo loop through the Eilat Mountains. It's about 5–6 hours, with views over 4 countries.
+- Bring at least 4 liters of water per person, and finish before midday.
+- In the afternoon, rest at the hotel pool, then have dinner at the marina.
+
+**Day 2 – Sat: Red Sea and an easier hike**
+- In the morning, snorkel at Coral Beach Nature Reserve.
+- Around midday, do a short hike in the Red Canyon (about 1.5 hours).
+- In the evening, have a sunset seafood dinner by the Promenade.
+
+**Rough budget (about 3000 NIS):**
+- Hotel for 2 nights: about 1600 NIS
+- Travel there and back (flight or bus): about 600 NIS
+- Food: about 500 NIS
+- Entry fees, snorkel gear and a car or taxi to the trails: about 300 NIS
+
+Do you want me to save this plan or make a packing list?
+[PASS] A7 Contradiction: budget 3000 active, 800 kept as superseded ([["800 NIS", "superseded"], ["3000 NIS", "active"]])
+[PASS] A8 Contradiction: hiking preference updated, old one kept as superseded ([["no long hikes", "superseded"], ["likes long desert hikes", "active"]])
+
+----- turn 7 -----
+user> Save the Eilat itinerary for 2 days.
+agent> I saved the Eilat plan as trip #2: 2 days, Fri–Sat Oct 30–31, with a 3000 NIS budget.
+
+- **Day 1:** Mount Shlomo loop (about 5–6 hours, starting around 6:00), then the pool and dinner at the marina. Check that the trails are open first, because of the flood risk after the Oct 27–28 showers.
+- **Day 2:** Snorkeling at Coral Beach, a short Red Canyon hike, then a sunset seafood dinner.
+
+Do you want a packing list for it?
+[PASS] A9 Second trip (Eilat) appended, first one kept (Eilat, 2 days)
+
+sdk: assertions 9/9, cost $0.1546, 62s -> results/sdk.json

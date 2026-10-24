@@ -54,3 +54,8 @@ def test_every_harness_responsibility_is_marked_replaces():
             if m := re.search(r"# replaces: (\w+)", line):
                 marked.add(m.group(1))
     assert marked == HARNESS
+
+
+def test_resumed_session_does_not_double_count_cost():
+    store.write_json(sdk_agent.SESSION_FILE, {"session_id": "abc", "total_cost_usd": 0.09})
+    assert sdk_agent.SDKTripAgent().cost_so_far == 0.09
